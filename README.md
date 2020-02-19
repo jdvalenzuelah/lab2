@@ -160,3 +160,73 @@ pid -w 1
 - ¿Qué tipo de cambios de contexto incrementa notablementeen cada caso, y por qué?
 
     Los cambios de contexto voluntarios incrementan constantemente. Al ser `Xorg` el manejador de ventanas, necesita cambiar de contexto constantemente.
+
+```c
+int main() {
+    clock_t start, end;
+    start = clock();
+    int i;
+    for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
+    for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
+    for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
+    end = clock();
+    double diff = ((double) end - start) / CLOCKS_PER_SEC; printf("%f\n", diff);
+}
+```
+### Ejecucion
+```bash
+$ ./a.o
+.
+.
+.
+999997
+999998
+999999
+6.622200
+```
+
+```c
+int main() {
+    pid_t son, grandson, grandgrandson;
+    clock_t start, finish;
+    int i;
+
+    start = clock();
+    son = fork();
+
+    if(son == 0 ) {
+        grandson = fork();
+        if(grandson == 0) {
+            grandgrandson = fork();
+            if(grandgrandson == 0) {
+                for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
+            } else {
+                for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
+                wait(NULL);
+            }
+        } else {
+            for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
+            wait(NULL);
+        }
+    } else {
+        wait(NULL);
+        finish = clock();
+        double diff = ((double) finish - start ) / CLOCKS_PER_SEC; printf("%f\n", diff);
+    }
+}
+```
+### Ejecucion
+```bash
+$ ./a.o
+.
+.
+.
+999997
+999998
+999999
+0.000235
+```
+- ¿Qué diferencia hay en el númeroy tipo de cambios de contexto de entre programas?
+-¿A qué puede atribuir los cambios de contexto voluntarios realizadospor sus programas?
+- ¿A   qué   puede   atribuir   los   cambios   de   contexto   involuntarios   realizados  porsus programas?
+- ¿Por  qué  el  reporte  de  cambios  de  contexto  para  su  programa  con `fork()`s muestra cuatro procesos, uno de los cuales reporta cero cambios de contexto?

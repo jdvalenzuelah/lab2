@@ -5,6 +5,7 @@
 int main() {
     pid_t son, grandson, grandgrandson;
     clock_t start, finish;
+    int i;
 
     start = clock();
     son = fork();
@@ -14,13 +15,13 @@ int main() {
         if(grandson == 0) {
             grandgrandson = fork();
             if(grandgrandson == 0) {
-                for(int i = 0; i < 1000000; i++) {printf("%d\n",i);}
+                for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
             } else {
-                for(int i = 0; i < 1000000; i++) {printf("%d\n",i);}
+                for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
                 wait(NULL);
             }
         } else {
-            for(int i = 0; i < 1000000; i++) {printf("%d\n",i);}
+            for(i = 0; i < 1000000; i++) {printf("%d\n",i);}
             wait(NULL);
         }
     } else {
