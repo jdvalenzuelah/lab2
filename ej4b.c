@@ -6,6 +6,6 @@ int main() {
         while(1);
     } else {
         int i;
-        for(i = 0; i < 400000; i++) { printf("%d\n", i);}
+        for(i = 0; i < 4000000; i++) { printf("%d\n", i);}
     }
 }

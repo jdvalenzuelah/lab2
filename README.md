@@ -316,4 +316,14 @@ $ kill -9 17377
 $ ps -ael | grep ej4b.o
 F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 1 S  1000   17378     996 57  80   0 -   579 -      pts/1    00:00:05 ej4b.o
+4 S  1000     996       1  0  80   0 -  5276 -      ?        00:00:04 systemd
+
 ```
+- ¿Qué sucede en la ventana donde ejecutó su programa?
+
+    El proceso hijo se sigue ejecutando, en cuanto termina queda suspendida hasta que recibe una interrupcion del teclado.
+
+- ¿Quién es el padre del proceso que quedó huérfano?
+
+    El proceso padre es ahora systemd
+
