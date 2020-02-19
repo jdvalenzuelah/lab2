@@ -182,7 +182,7 @@ $ ./a.o
 999997
 999998
 999999
-6.622200
+4.622200
 ```
 
 ```c
@@ -226,7 +226,94 @@ $ ./a.o
 999999
 0.000235
 ```
+![pidstat no fork](./images/pidstat-no-fork.png)
+![pidstat with fork](./images/pidstat-with-fork.png)
+
 - ¿Qué diferencia hay en el númeroy tipo de cambios de contexto de entre programas?
--¿A qué puede atribuir los cambios de contexto voluntarios realizadospor sus programas?
+
+    En el programa que realiza `fork()`s hay mas cambios de contexto, esto es debido a que hay distintos procesos que son generados con cada llamada a `fork`, que el sistema operativo debe de calendarizar.
+
+- ¿A qué puede atribuir los cambios de contexto voluntarios realizados por sus programas?
+
+    A las llamadas a `WAIT`
+
 - ¿A   qué   puede   atribuir   los   cambios   de   contexto   involuntarios   realizados  porsus programas?
+
+    Al calendarizador del sistema operativo.
+
 - ¿Por  qué  el  reporte  de  cambios  de  contexto  para  su  programa  con `fork()`s muestra cuatro procesos, uno de los cuales reporta cero cambios de contexto?
+
+    Las llamadas a `fork` crean estos nuevos procesos, el proceso que muestra 0 cambios de contexto es el proceso bisnieto que no necesita cambiar el contexto.
+
+![pidstat with fork](./images/pidstat-undefined.png)
+
+- ¿Qué efecto percibe sobre el número de cambios de contexto de cada tipo?
+     
+     El numero de cambios de contexto involuntarios aumento, debido a las interrupciones que causa el utilizar la interfaz grafica.
+
+## Ejercicio 4
+```c
+int main() {
+    if(fork()) {
+        while(1);
+    } else {
+        printf("Child process");
+    }
+}
+```
+##### Compilacion:
+```bash
+$ gcc ej14.c -o ej4.o
+```
+##### Ejecucion
+```bash
+$ chmod +x ej4.o
+$ ./ej4.o
+```
+
+##### Salida
+```bash
+$ ps -ael | grep ej4.o
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 R  1000   11891    5321 99  80   0 -   546 -      pts/1    00:00:34 ej4.o
+1 Z  1000   11892   11891  0  80   0 -     0 -      pts/1    00:00:00 ej4.o <defunct>
+```
+- ¿Qué significa la Z y a qué se debe?
+    
+    Es el codigo del estado del proceso. La `Z` es comunmente conocido como un proceso zombie. Esto significa que el proceso ha terminado, pero no ha sido recolectado por el proceso padre.
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    if(fork()) {
+        while(1);
+    } else {
+        int i;
+        for(i = 0; i < 4000000; i++) { printf("%d\n", i);}
+    }
+}
+```
+##### Compilacion:
+```bash
+$ gcc ej4b.c -o ej4b.o
+```
+##### Ejecucion
+```bash
+$ chmod +x ej4b.o
+$ ./ej4b.o
+```
+##### Salida
+```bash
+$ ps -ael | grep ej4b.o
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 R  1000   17377    5321 99  80   0 -   546 -      pts/1    00:00:01 ej4b.o
+1 R  1000   17378   17377 56  80   0 -   579 -      pts/1    00:00:00 ej4b.o
+
+$ kill -9 17377
+
+$ ps -ael | grep ej4b.o
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+1 S  1000   17378     996 57  80   0 -   579 -      pts/1    00:00:05 ej4b.o
+```
