@@ -326,4 +326,37 @@ F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 - ¿Quién es el padre del proceso que quedó huérfano?
 
     El proceso padre es ahora systemd
+## Ejerecicio 5
 
+##### Compilacion:
+```bash
+$ gcc -lrt ipc.c -o main.o
+```
+##### Ejecucion
+```bash
+$ chmod +x main.o
+$ ./main.o
+```
+- ¿Qué diferencia hay entrerealizar comunicación usando memoria compartida en lugar de usando un archivo de texto común y corriente?
+
+    Se ahorra el cuello de botella que es escribir directamente a un archivo de texto, donde se escribe directamente a almacenamiento.
+
+- ¿Por qué no se debe usar el file descriptor de la memoria compartida producido porotra instancia para realizar el mmap?
+
+    En ese caso se pierde las ventajas que se obtienen de utilizar la memoria compartida.
+
+- ¿Es posible enviar el outputde un programa ejecutado con execa otro proceso por medio de un pipe? Investigue y explique cómo funciona este mecanismoen la terminal (e.g.,la ejecución de ls | less).
+
+    Se utilizan las llamadas a sistema `pipe()` para accedes al sistema de archivos virtual (vfs) que los sistemas *unix ofrecen.
+
+- ¿Cómo  puede  asegurarse  de  que  ya  se  ha  abierto  un  espacio  de  memoria  compartida  con  un nombre determinado? Investigue y explique errno.
+
+    El error `EEXIST` retorna cuando el espacio de memoria ya existe y se especifico los modos  **O_CREAT** y **O_EXCL** 
+
+- ¿Qué pasa si se ejecuta shm_unlink cuando hay procesos que todavía están usando la memoria compartida?
+    
+    Retorna un error de acceso `EACCES`
+
+- Imagine   que   una   ejecución   de   su   programa   sufre   un   error   que   termina   la   ejecución prematuramente, dejando el espacio de memoria compartidaabierto y provocando que nuevas ejecuciones se queden esperando el file descriptordel espacio de memoria compartida. ¿Cómo puede liberarel espacio de memoria compartida “manualmente”?
+
+    Se puede utilizar `shm_unlink` manualmente.
