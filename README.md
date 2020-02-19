@@ -52,7 +52,7 @@
 - ¿Cuántos procesos se crean en cada uno de los programas?
     ```bash
     $ ./a.o | grep -o PID | wc -l
-    16
+    64
     $ ./b.o | grep -o PID | wc -l | xargs -I n expr n / 4
     16
     ```
